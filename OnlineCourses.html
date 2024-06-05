@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Courses Registration</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="loader-overlay" id="loader-overlay" style="display: none;">
+        <div class="loader-container">
+            <div class="circle-loader"></div>
+            <span class="text-loader">Processing</span>
+        </div>
+    </div>     
+    <div class="form-container signup" id="signupContainer">
+        <h2>CS501 Courses</h2>
+        <h3>Register Yourself</h3>
+        <form id="signupForm" action="#" method="post">
+            <div class="form">
+                <input type="text" name="full-name" id="full-name" autocomplete="off" required />
+                <label for="full-name" class="label-name">
+                    <span class="content-name">Full name</span>
+                </label>
+            </div>
+            <div class="form">
+                <input type="email" name="email" id="email" autocomplete="off" required />
+                <label for="email" class="label-name">
+                    <span class="content-name">Email</span>
+                </label>
+            </div>
+            <div class="form">
+                <input type="tel" name="phone" id="phone" autocomplete="off" required />
+                <label for="phone" class="label-name">
+                    <span class="content-name">Phone Number</span>
+                </label>
+            </div>
+            <div class="form">
+                <input type="password" name="password" id="password" autocomplete="off" required />
+                <label for="password" class="label-name">
+                    <span class="content-name">Password</span>
+                </label>
+            </div>
+            <div class="form">
+                <input type="text" name="referral-code" id="referral-code" autocomplete="off" required />
+                <label for="referral-code" class="label-name">
+                    <span class="content-name">Referral Code</span>
+                </label>
+            </div>
+            <button type="submit" id="signupButton">Signup</button>
+            
+        </form>
+        <p>Already have an account? <button type="button" onclick="showLoginForm()">Login</button></p>
+    </div>
+    <div class="form-container login" id="loginContainer">
+        <h2>CS501 Courses</h2>
+        <h3>Login Here</h3>
+        <form id="loginForm" action="#" method="post">
+            <div class="form">
+                <input type="email" name="email" id="login-email" autocomplete="off" required />
+                <label for="login-email" class="label-name">
+                    <span class="content-name">Email</span>
+                </label>
+            </div>
+            <div class="form">
+                <input type="password" name="password" id="login-password" autocomplete="off" required />
+                <label for="login-password" class="label-name">
+                    <span class="content-name">Password</span>
+                </label>
+            </div>
+            <button type="submit" id="loginButton">Login</button>
+        </form>
+        <p>Don't have an account? <button type="button" onclick="showSignupForm()">Signup</button></p>
+    </div>
+    <div class="form-container confirmation" id="confirmationContainer">
+        <h2>CS501 Courses</h2>
+        <h3>Confirmation Required</h3>
+        <p>We have sent you a confirmation code to the phone number you entered. Click on the link in the message to complete your registration and enjoy the new courses.</p>
+    </div>
+    
+    <div id="customAlert" class="alert">
+        <span class="closebtn" onclick="closeAlert()">&times;</span>  
+        <strong>Error:</strong> <span id="alertMessage"></span>
+    </div>
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var password = document.getElementById('password').value;
+            var referralCode = document.getElementById('referral-code').value;
+            var phoneNumber = document.getElementById('phone').value;
+            var submitButton = document.getElementById('signupButton');
+            var passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
+            var phonePattern = /^03([0-4]\d|50)\d{7}$/;
+            if (!phonePattern.test(phoneNumber)) {
+                showAlert('Invalid phone number format! Please enter a valid Pakistani phone number starting with 03');
+            } 
+            else if (!passwordPattern.test(password)) {
+                showAlert('Password must contain at least one uppercase letter, one lowercase letter, one digit, one special character, and be at least 8 characters long.');
+            } 
+            else if (referralCode !== '123') {
+                submitButton.disabled = true; // Disable the submit button
+                submitButton.innerText = 'Invalid Code'; // Change button text to alert text
+                submitButton.style.backgroundColor = '#f44336'; // Change button color to alert color
+                setTimeout(function() {
+                    submitButton.disabled = false; // Enable the submit button after two seconds
+                    submitButton.innerText = 'Signup'; // Reset button text
+                    submitButton.style.backgroundColor = '#007BFF'; // Reset button color
+                }, 2000);
+            } 
+             else {
+                showLoader(function() {
+                    showConfirmationForm();
+                });
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            showLoader(function() {
+                showAlert('Account not found!');
+            });
+        });
+
+        function showSignupForm() {
+            document.getElementById('signupContainer').style.display = 'flex';
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('confirmationContainer').style.display = 'none';
+        }
+
+        function showLoginForm() {
+            document.getElementById('signupContainer').style.display = 'none';
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('confirmationContainer').style.display = 'none';
+        }
+
+        function showConfirmationForm() {
+            document.getElementById('signupContainer').style.display = 'none';
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('confirmationContainer').style.display = 'flex';
+        }
+
+        function showAlert(message) {
+            var alertDiv = document.getElementById("customAlert");
+            document.getElementById("alertMessage").textContent = message;
+            alertDiv.style.display = "block";
+            setTimeout(function() {
+                alertDiv.style.display = "none";
+            }, 2000);
+        }
+
+        function closeAlert() {
+            var alertDiv = document.getElementById("customAlert");
+            alertDiv.style.display = "none";
+        }
+
+        function showLoader(callback) {
+            const loaderOverlay = document.getElementById('loader-overlay');
+            loaderOverlay.style.display = 'flex';
+            setTimeout(function() {
+                loaderOverlay.style.display = 'none';
+                callback();
+            }, 2000);
+        }
+
+        showSignupForm();
+    </script>
+</body>
+</html>
